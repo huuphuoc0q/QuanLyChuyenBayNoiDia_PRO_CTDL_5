@@ -21,8 +21,6 @@ class MayBay{
 
         void xuat() const; 
 
-        //Destructor
-        // ~MayBay(); 
 }; 
 
 #endif

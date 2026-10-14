@@ -11,7 +11,7 @@ class KhachHang {
     public: 
         //Constructor - Tien
         KhachHang(); 
-        KhachHang(int& stt, const std::string name, const std::string cmnd); 
+        KhachHang(const int &stt, const std::string &name, const std::string &cmnd); 
 
         //Getter, Setter - Mong Tien
         std::string getCmnd() const;

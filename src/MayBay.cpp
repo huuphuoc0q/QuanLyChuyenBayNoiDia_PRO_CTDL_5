@@ -4,12 +4,15 @@
 
 
 //Constructor - Minh Tien
-// MayBay::MayBay(){
-//     soHieu_ = ""; 
-//     soCho_ = 0; 
-// }
+MayBay::MayBay() {
+    soHieu_ = "";
+    soCho_ = 0;
+}
 
-// MayBay::MayBay(const std::string& soHieu_, const int& soCho_) : soHieu_(soHieu_), soCho_(soCho_) {}; 
+MayBay::MayBay(const std::string& soHieu_, const int& soCho_) {
+    this->soHieu_ = soHieu_;
+    this->soCho_ = soCho_;
+}
 
 //Getter, Setter - Mong Tien
 // std::string MayBay::getSoHieu() const{

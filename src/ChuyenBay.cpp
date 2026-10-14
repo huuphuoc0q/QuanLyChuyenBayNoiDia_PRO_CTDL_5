@@ -4,24 +4,25 @@
 #include "../include/LinkedList.h"
 
 
-//constructor - Minh Tien
-// ChuyenBay::ChuyenBay() {
-//     maChuyenBay_ = ""; 
-//     soHieuMayBay_ = ""; 
-//     mbCB_ = nullptr;
-//     ngayKhoiHanh_ = "";
-//     sanBayDen_ = "";
-//     trangThai_ = -1; 
-// }
+ChuyenBay::ChuyenBay() {
+    maChuyenBay_ = "";
+    mbCB_ = nullptr;
+    soHieuMayBay_ = "";
+    ngayKhoiHanh_ = "";
+    sanBayDen_ = "";
+    trangThai_ = -1;
+}
 
-// ChuyenBay::ChuyenBay(const std::string maCB_,MayBay* mbChuyenBay_, const std::string soHieuMB_, const std::string ngayKH_, const std::string sanBD_,  int status_){
-//     maChuyenBay_ = maCB_; 
-//     mbCB_ = mbChuyenBay_; 
-//     soHieuMayBay_ = soHieuMB_; 
-//     ngayKhoiHanh_ = ngayKH_;
-//     sanBayDen_ = sanBD_;
-//     trangThai_ = status_; 
-// }
+ChuyenBay::ChuyenBay(const std::string& maCB_, MayBay* mbChuyenBay_, const std::string& soHieuMB_, 
+const std::string& ngayKH_, const std::string& sanBD_, const int& status_) {
+    maChuyenBay_ = maCB_;
+    mbCB_ = mbChuyenBay_;
+    soHieuMayBay_ = soHieuMB_;
+    ngayKhoiHanh_ = ngayKH_;
+    sanBayDen_ = sanBD_;
+    trangThai_ = status_;
+}
+
 
 //getter/setter - Mong Tien
 // std::string  ChuyenBay::getMaCB() const {
