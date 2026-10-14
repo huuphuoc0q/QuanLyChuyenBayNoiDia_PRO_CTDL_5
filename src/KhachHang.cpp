@@ -17,15 +17,15 @@ KhachHang::KhachHang(const int& stt, const std::string& name, const std::string&
 
 
 //Getter/ setter - Mong Tien
-// std::string KhachHang::getCmnd() const {
-//     return cmnd_; 
-// };
-// std::string KhachHang::getName() const {
-//     return name_; 
-// } 
-// int KhachHang::getStt() const{
-//     return stt_; 
-// }
+std::string KhachHang::getCmnd() const {
+    return cmnd_; 
+};
+std::string KhachHang::getName() const {
+    return name_; 
+} 
+int KhachHang::getStt() const{
+    return stt_; 
+}
 
 
 //Ham Xu Ly

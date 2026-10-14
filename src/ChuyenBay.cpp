@@ -25,41 +25,41 @@ const std::string& ngayKH_, const std::string& sanBD_, const int& status_) {
 
 
 //getter/setter - Mong Tien
-// std::string  ChuyenBay::getMaCB() const {
-//     return maChuyenBay_;
-// }
-// std::string ChuyenBay::getSoHieuMB() const{
-//     return soHieuMayBay_;
-// } 
-// std::string ChuyenBay::getNgayKH() const{
-//     return ngayKhoiHanh_;
-// } 
-// std::string ChuyenBay::getSanBD() const {
-//     return sanBayDen_;
-// }
-// int ChuyenBay::getStatus() const {
-//     return trangThai_;
-// }
+std::string  ChuyenBay::getMaCB() const {
+    return maChuyenBay_;
+}
+std::string ChuyenBay::getSoHieuMB() const{
+    return soHieuMayBay_;
+} 
+std::string ChuyenBay::getNgayKH() const{
+    return ngayKhoiHanh_;
+} 
+std::string ChuyenBay::getSanBD() const {
+    return sanBayDen_;
+}
+int ChuyenBay::getStatus() const {
+    return trangThai_;
+}
 
-// std::vector<int> ChuyenBay::getDSGheTrong() const{
-//     return dsGheTrong_; 
-// }
+std::vector<int> ChuyenBay::getDSGheTrong() const{
+    return dsGheTrong_; 
+}
 
-// std::vector<Ve> ChuyenBay::getDSVe() const{
-//     return dsVe_; 
-// }
+std::vector<Ve> ChuyenBay::getDSVe() const{
+    return dsVe_; 
+}
 
-// int ChuyenBay::getSoLuongGheTrong() const {
-//     return soLuongGheTrong_; 
-// }
+int ChuyenBay::getSoLuongGheTrong() const {
+    return soLuongGheTrong_; 
+}
 
-// MayBay* ChuyenBay::getMB() const {
-//     return mbCB_; 
-// }
+MayBay* ChuyenBay::getMB() const {
+    return mbCB_; 
+}
 
-// void ChuyenBay::setStatus(int newStatus_){
-//     trangThai_ = newStatus_; 
-// }
+void ChuyenBay::setStatus(int newStatus_){
+    trangThai_ = newStatus_; 
+}
 
 //Ham xu ly
 void ChuyenBay::xuat() const { 

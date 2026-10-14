@@ -79,18 +79,6 @@ void FileStore::loadKhachHang(std::vector<KhachHang> dsKhachHang, int& sizeKhach
     fi.close(); 
 }
 
-// void FileStore::loadVe(std::vector<Ve> dsVe,int& sizeDSVe_){
-//     std::ifstream fi("data/Ve.txt"); 
-//     sizeDSVe_ = 0; 
-    
-//     std::string maVe = "";
-//     int soGhe;
-//     while(fi>>maVe>>soGhe){
-//         dsVe.push_back(Ve(sizeDSVe_+1, )); 
-//         sizeDSVe_++; 
-//     }
-//     fi.close(); 
-// }
 
 void FileStore::luuThongTinKH(const KhachHang& khachHang_) {
     std::ofstream fo("data/KhachHang.txt", std::ios::app); 
@@ -98,14 +86,28 @@ void FileStore::luuThongTinKH(const KhachHang& khachHang_) {
     fo.close(); 
 }
 
-void FileStore::luuVe(std::vector<Ve> DSVe_) {
-    std::ofstream fo("data/Ve.txt"); 
-    for(int i=0;i<DSVe_.size(); i++)
-        fo<<DSVe_[i].getMaVe()<<" "<<DSVe_[i].getSoGhe()<<" "<<
-            "["<<DSVe_[i].getKhachHang().getStt()<<" "<<
-            DSVe_[i].getKhachHang().getName()<<" "<<
-            DSVe_[i].getKhachHang().getCmnd()<<"]"<<std::endl;
-    fo.close(); 
+void FileStore::luuVe(std::vector<Ve>& DSVe_) {
+    for(int i=0;i<DSVe_.size(); i++){
+        std::string nameVe_ = DSVe_[i].getMaVe();
+        std::ofstream fo("data/DATA_VE/" + nameVe_ + ".txt",std::ios::out);  
+            fo<<DSVe_[i].getMaVe()<<" "<<DSVe_[i].getSoGhe() + 1<<" "<<
+                "["<<DSVe_[i].getKhachHang().getStt()<<" "<<
+                DSVe_[i].getKhachHang().getName()<<" "<<
+                DSVe_[i].getKhachHang().getCmnd()<<"]"<<std::endl;
+        fo.close(); 
+    }
+}
+
+void FileStore::xoaVe(std::string maVe_) {
+    std::string duong_dan = "data/DATA_VE/" + maVe_ + ".txt";
+    int tmp = std::remove(duong_dan.c_str());
+}
+
+void FileStore::cleanVe(std::vector<Ve>& dsVe){
+    int sizeDSVe_ = dsVe.size();
+    for(int i = 0; i<sizeDSVe_; i++) {
+        xoaVe(dsVe[i].getMaVe());
+    }
 }
 
 

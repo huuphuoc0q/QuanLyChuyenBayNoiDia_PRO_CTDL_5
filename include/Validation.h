@@ -15,6 +15,7 @@ namespace Validation {
 
     bool validSoHieuMB(const std::string& soHieuMB);
 
+    std::string chuanHoa( std::string& s);
 }
 
 #endif

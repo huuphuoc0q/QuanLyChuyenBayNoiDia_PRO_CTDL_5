@@ -3,13 +3,12 @@
 
 #include<fstream>
 #include<string>
+#include<cstdio>
 #include<iostream>
 #include "MayBay.h"
 #include "ChuyenBay.h"
 #include "KhachHang.h"
 #include "Ve.h"
-
-
 namespace FileStore {
     void loadMayBay(MayBay* dsMayBay, int& sizeMayBay_) ;
     void loadChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, MayBay* dsMayBay, int& sizeDSMayBay);
@@ -17,8 +16,9 @@ namespace FileStore {
     void loadVe(std::vector<Ve> dsVe, int& sizeDSVe_);
 
     void luuThongTinKH(const KhachHang& khachHang_);  
-    void luuVe(std::vector<Ve> dsVe);
-
+    void luuVe(std::vector<Ve>& dsVe);
+    void xoaVe(std::string maVe_);
+    void cleanVe(std::vector<Ve>& dsVe); 
     void loadTaiKhoanAdmin(std::string& user, std::string& pass); 
 }
 

@@ -15,13 +15,13 @@ MayBay::MayBay(const std::string& soHieu_, const int& soCho_) {
 }
 
 //Getter, Setter - Mong Tien
-// std::string MayBay::getSoHieu() const{
-//     return  soHieu_; 
-// }
+std::string MayBay::getSoHieu() const{
+    return  soHieu_; 
+}
 
-// int MayBay::getSoCho() const{ 
-//     return soCho_; 
-// }
+int MayBay::getSoCho() const{ 
+    return soCho_; 
+}
 
 //Ham xu ly
 void MayBay::xuat() const { 

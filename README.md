@@ -1,4 +1,4 @@
-hướng dẫn chạy: g++ -Iinclude src/main.cpp src/MayBay.cpp src/ChuyenBay.cpp src/FileStore.cpp src/ThongKe.cpp src/KhachHang.cpp src/Ve.cpp -o main.exe
+hướng dẫn chạy: g++ -Iinclude src/main.cpp src/MayBay.cpp src/ChuyenBay.cpp src/FileStore.cpp src/ThongKe.cpp src/KhachHang.cpp src/Ve.cpp src/Validation.cpp -o main.exe
 chạy thực thi: .\main.exe
 
 HƯỚNG DẪN QUY TRÌNH LÀM VIỆC GITHUB: 

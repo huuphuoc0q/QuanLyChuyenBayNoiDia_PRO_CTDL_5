@@ -4,7 +4,6 @@
 #include <iostream> 
 #include <string> 
 #include "KhachHang.h"
-#include "ChuyenBay.h"
 
 class ChuyenBay;
 class Ve { 

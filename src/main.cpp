@@ -6,6 +6,8 @@
 #include "../include/KhachHang.h"
 #include "../include/ThongKe.h"
 #include "../include/FileStore.h"
+#include "../include/Validation.h"
+
 
 #include<vector> 
 #include<fstream>
@@ -32,7 +34,7 @@ void hienThiDSChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay) {
     Sleep(5000);
     std::system("cls");
 }
-void datVe(int idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, std::queue<Ve>& tmpDSVe_) {
+void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, std::queue<Ve>& tmpDSVe_) {
     std::system("cls");
     int tmpStatusCB = 0; 
     int numCB;
@@ -87,15 +89,21 @@ void datVe(int idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay,
     if(cbUserChon_.getSoLuongGheTrong() == 0) cbUserChon_.setStatus(2); 
 
     //Nhap thong tin khachhang - khoi tao ve: 
-    std::string nameKH_; 
-    std::string cmndKH_; 
+    std::string nameKH_ = ""; 
+    std::string cmndKH_ = ""; 
     
-    std::cout<<"Nhap ho va ten: "; 
-    std::getline(std::cin, nameKH_);
-    std::cout<<"Nhap CMND: "; std::cin>>cmndKH_;
+    while(Validation::empty(nameKH_)){
+        std::cout<<"Nhap ho va ten: "; 
+        std::getline(std::cin, nameKH_);
+    }
+    while(Validation::empty(cmndKH_) || !Validation::validCMND(cmndKH_)){
+        std::cout<<"Nhap CMND: "; std::cin>>cmndKH_;
+    }
 
+    //Chuan hoa
+    nameKH_ = Validation::trimAndStandardizeSpace(nameKH_);
     //khoi tao thong tin khach hang + ve
-    KhachHang KH_ = KhachHang(idx_, nameKH_, cmndKH_);
+    KhachHang KH_ = KhachHang(idx_, Validation::chuanHoa(nameKH_), Validation::trimAndStandardizeSpace(cmndKH_));
     Ve veKH_  = Ve(cbUserChon_.getMaCB() + std::to_string(numGhe + 1), cbUserChon_.getMaCB(),&cbUserChon_, numGhe, KH_);
     
 
@@ -117,7 +125,6 @@ void xuLyDatVe(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, s
     while(!tmpDSVe_.empty()) {
         Ve& tmp = tmpDSVe_.front(); 
         tmp.getKhachHang().xuat();
-        // std::cout<<"Ve da dat "<<tmp.getMaVe()<<" "<<tmp.getSoGhe()<<std::endl;
         tmp.xuat(); 
         tmpDSVe_.pop(); 
     }
@@ -133,10 +140,10 @@ void xuLyDatVe(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, s
                 continue;
             }
             cbVe_->themVe(nowVe_);
-            cbVe_->xoaGheTrong(nowVe_.getSoGhe()); 
             dsVe_.push_back(nowVe_); 
             dsKhachHang_.push_back(nowVe_.getKhachHang()); 
         }
+        FileStore::luuVe(dsVe_);
         std::cout<<"Da duyet tat ca";
     }
     else {
@@ -145,6 +152,18 @@ void xuLyDatVe(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, s
     }
     Sleep(2000); 
 }
+
+void xuatDSVe_(std::vector<Ve>& dsVe_, int sizeDSVe_){
+    if(sizeDSVe_ == 0){
+        std::cout<<"KHONG CO KHACH HANG DANG KI VE!"<<std::endl;
+        return;
+    }
+    std::cout<<"DS Ve:"<<std::endl;
+    for(int i = 0; i<sizeDSVe_; i++) {
+            std::cout<<i+1<<": ";
+            dsVe_[i].xuat(); 
+        }
+}
 void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
     int sizeDSVe_ = dsVe_.size(); 
     if(sizeDSVe_ == 0){
@@ -152,11 +171,7 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
         Sleep(2000); 
         return;
     }
-    std::cout<<"Chon ve can tra ve hoac nhap '2204' de thoat chuc nang"<<std::endl;
-    for(int i = 0; i<sizeDSVe_; i++) {
-        std::cout<<i+1<<": ";
-        dsVe_[i].xuat(); 
-    }
+    xuatDSVe_(dsVe_, sizeDSVe_); 
     int q; 
     while(true){
         std::cin>>q; 
@@ -170,6 +185,7 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
                     std::cout<<"Chuyen bay da hoan tat! Khong the huy ve"<<std::endl;
                 }
                 else {
+                    FileStore::xoaVe(dsVe_[q-1].getMaVe());
                     tmp->xoaVe(dsVe_[q-1].getMaVe());
                     for(int i = 0; i<sizeDSVe_; i++){
                         if (dsVe_[i].getMaVe() == dsVe_[q-1].getMaVe()){
@@ -179,8 +195,9 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
                             break;
                         }
                     }
-                    std::cout<<"Xoa ve thanh cong! Chon ve can xoa hoac nhap '2204' de thoat"
-                    <<std::endl; 
+                    FileStore::luuVe(dsVe_);
+                    std::cout<<"Xoa ve thanh cong!"<<std::endl; 
+                    xuatDSVe_(dsVe_, sizeDSVe_); 
                 }
             }
         }
@@ -212,8 +229,12 @@ void quanLy(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, std:
     std::string user_enter, pass_enter;
     int cnt = 3; 
     while(cnt>0){
-        std::cout<<"Nhap tai khoan: "; std::cin>>user_enter; 
-        std::cout<<"Nhap mat khau: "; std::cin>>pass_enter;
+        while(Validation::empty(user_enter)) {
+            std::cout<<"Nhap tai khoan: "; std::cin>>user_enter; 
+        }
+        while(Validation::empty(pass_enter)) {
+            std::cout<<"Nhap mat khau: "; std::cin>>pass_enter;
+        }
         if (user_enter == user && pass_enter == pass){
             std::cout<<"Dang nhap thanh cong!";
             Sleep(2000); 
@@ -267,7 +288,6 @@ int main(){
     std::queue<Ve> tmpDSVe_; 
     while(true){
         std::system("cls");
-
         cnt++; 
         std::cout<<"Vui long chon option: "<<std::endl<<
             "1. Hien thi dsChuyenBay"<<std::endl<<
@@ -280,6 +300,7 @@ int main(){
         else break; 
     }
 
+    FileStore::cleanVe(dsVe_); 
     delete[] dsMayBay; 
     delete[] dsChuyenBay; 
     return 0; 

@@ -19,7 +19,7 @@ void ThongKe::displayKHChuyenBay(ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_){
             for(int i = 0; i<sizeDSVe_ ; i++){
                 std::cout<<i+1<<": "
                 <<"name: "<<dsVe_[i].getKhachHang().getName()
-                <<"cmnd: "<<dsVe_[i].getKhachHang().getCmnd()
+                <<" cmnd: "<<dsVe_[i].getKhachHang().getCmnd()
                 <<std::endl; 
             }
             std::cout<<"Chon chuyen bay khac hoac 2204 de thoat"<<std::endl;
