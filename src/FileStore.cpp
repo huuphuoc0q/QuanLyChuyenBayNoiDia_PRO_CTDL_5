@@ -16,10 +16,10 @@ void FileStore::loadMayBay(MayBay* dsMayBay, int& sizeDSMayBay) {
     fi.close(); 
 }
 
-void FileStore::loadChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, MayBay* dsMayBay, int& sizeDSMayBay) {
+void FileStore::loadChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay, MayBay* &dsMayBay, int& sizeDSMayBay) {
     std::ifstream fi("data/ChuyenBay.txt");
-    
     sizeDSChuyenBay = 0; 
+    
     std::string maCB = "";
     std::string soHieu = "";
     std::string ngay = "";
@@ -35,8 +35,7 @@ void FileStore::loadChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, MayB
                 break; 
             }
         } 
-        dsChuyenBay[sizeDSChuyenBay++] = ChuyenBay(maCB,mbCB, soHieu, ngay, sanDen, ranDomST - 1);
-        ChuyenBay& cbHienTai = dsChuyenBay[sizeDSChuyenBay - 1];
+        ChuyenBay cbHienTai = ChuyenBay(maCB, mbCB, soHieu, ngay, sanDen, ranDomST - 1);
         if (mbCB == nullptr) continue;  
         int soCho_ = mbCB->getSoCho();
 
@@ -57,15 +56,20 @@ void FileStore::loadChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, MayB
                     break;
                 }
             case 3: //Hoan tat
-                break;
+                {
+                    cbHienTai.khoiTaoGheTrong(soCho_, 1);
+                    break;
+                }
             default: 
                 break;
         }
+        dsChuyenBay.insert(cbHienTai); 
+        sizeDSChuyenBay++;
     }
     fi.close(); 
 }
 
-void FileStore::loadKhachHang(std::vector<KhachHang> dsKhachHang, int& sizeKhachHang) {
+void FileStore::loadKhachHang(std::vector<KhachHang>& dsKhachHang, int& sizeKhachHang) {
     std::ifstream fi("data/KhachHang.txt"); 
     sizeKhachHang = 0; 
     int stt = 0; 

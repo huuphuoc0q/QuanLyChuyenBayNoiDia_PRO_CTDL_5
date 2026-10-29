@@ -7,7 +7,8 @@
 #include "../include/ThongKe.h"
 #include "../include/FileStore.h"
 #include "../include/Validation.h"
-
+#include "../include/LinkedList.h"
+#include "../include/BST.h"
 
 #include<vector> 
 #include<fstream>
@@ -15,39 +16,49 @@
 #include <windows.h>
 #include <queue>
 #include <ctime>
+#include <iomanip>
 
-void xoaKhachHang(std::vector<KhachHang>& dsKhachHang_, std::string cmndKH_){
-    int sizeDSKhachHang_ = dsKhachHang_.size(); 
-    for(int i = 0; i<sizeDSKhachHang_; i++) {
-        if (cmndKH_ == dsKhachHang_[i].getCmnd()) {
-            dsKhachHang_.erase(dsKhachHang_.begin() + i); 
-            return; 
-        }
+void hienThiDSChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay) {
+    int q = -1; 
+    while(q<0){
+        std::system("cls"); 
+        std::cout << "====================================================================================\n";
+        std::cout << "                             DANH SACH CHUYEN BAY                                   \n";
+        std::cout << "====================================================================================\n";
+            std::cout << std::left 
+                    << std::setw(16) << "Ma chuyen bay"
+                    << std::setw(22) << "Ngay khoi hanh"
+                    << std::setw(15) << "San bay den"
+                    << std::setw(15) << "Trang thai"
+                    << std::setw(15) << "Danh sach ve" << "\n";
+            std::cout << std::string(83, '-') << "\n";
+        dsChuyenBay.xuat(); 
+        std::cin>>q; 
     }
+    
 }
-
-void hienThiDSChuyenBay(ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay) {
-    for(int i = 0; i<sizeDSChuyenBay; i++) {
-        std::cout<<"STT: "<<i+1<<" ";
-        dsChuyenBay[i].xuat();
-    }
-    Sleep(5000);
-    std::system("cls");
-}
-void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay, int& sizeDSChuyenBay, std::queue<Ve>& tmpDSVe_) {
+void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay, LinkedList<Ve>& tmpDSVe_) {
     std::system("cls");
     int tmpStatusCB = 0; 
     int numCB;
+    std::vector<ChuyenBay*> dsCB_;
+    dsChuyenBay.getList(dsCB_); 
+
     //chon chuyen bay
-    while(tmpStatusCB == 0 || tmpStatusCB == 3) {
-        std::cout<<"Chon chuyen bay: "; 
-        for(int i = 0; i<sizeDSChuyenBay; i++) {
-            if(dsChuyenBay[i].getStatus() != 1) continue; 
-            std::cout<<i+1<<": "<<dsChuyenBay[i].getMaCB()<<std::endl;
+    while(true) {
+        std::cout<<"Chon chuyen bay: "<<std::endl;
+        for(int i = 0; i < dsCB_.size(); i++){
+            std::cout<<i+1<<": "<<dsCB_[i]->getMaCB() << " SBD: "<< dsCB_[i]->getSanBD()<<"Status: "<<dsCB_[i]->getStatus()<<std::endl;
         }
-        std::cin>>numCB; numCB-=1;
-        tmpStatusCB = dsChuyenBay[numCB].getStatus(); 
-        
+        std::cin>>numCB;
+        if (numCB<=0 || numCB>sizeDSChuyenBay) {
+            std::cout<<"Chuyen bay lua chon khong phu hop! Nhap 2204 de thoat"<<std::endl;
+            if(numCB == 2204) return; 
+            continue;
+        }
+        numCB-=1;
+        tmpStatusCB = dsCB_[numCB]->getStatus(); 
+        if(tmpStatusCB == 1) break;
         switch(tmpStatusCB) {
             case 0: {
                 std::cout<<"Chuyen bay da bi huy! Vui long chon chuyen bay khac."<<std::endl;
@@ -65,28 +76,35 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay
                 break;
         }
     }
-    ChuyenBay& cbUserChon_ = dsChuyenBay[numCB]; 
-    std::vector<int> dsGheTrong_ = dsChuyenBay[numCB].getDSGheTrong(); 
+    ChuyenBay* cbUserChon_ = dsCB_[numCB]; 
+    std::vector<int> dsGheTrong_ = dsCB_[numCB]->getDSGheTrong(); 
+
     //chon ghe
     int numGhe = -1; 
     while(true){
         std::cout<<"Danh sach ghe trong hien tai: ";
         int count = 1; 
         for(int i: dsGheTrong_) {
-            if(i==0) {
+            if( i == 0 ) {
                 std::cout<<count<<" ";
             }
             count++; 
         }
-        std::cin>>numGhe; numGhe--;
-        if (dsGheTrong_[numGhe]==0) break;
+        
+        while(numGhe<0 || numGhe > dsCB_[numCB]->getMB()->getSoCho()) {
+            std::cout<<std::endl<<"Ghe ban chon la: "; 
+            std::cin>>numGhe; 
+        }
+        numGhe--;
+        if (dsGheTrong_[numGhe] == 0) break;
         else {
             std::cout<<"Ghe chon khong phu hop! Vui long chon lai"<<std::endl;
         }
     } 
     std::cin.ignore(10000, '\n');
+
     //Kiem tra da het ghe hay chua
-    if(cbUserChon_.getSoLuongGheTrong() == 0) cbUserChon_.setStatus(2); 
+    if(cbUserChon_->getSoLuongGheTrong() == 0) cbUserChon_->setStatus(2); 
 
     //Nhap thong tin khachhang - khoi tao ve: 
     std::string nameKH_ = ""; 
@@ -97,58 +115,64 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, ChuyenBay* dsChuyenBay
         std::getline(std::cin, nameKH_);
     }
     while(Validation::empty(cmndKH_) || !Validation::validCMND(cmndKH_)){
-        std::cout<<"Nhap CMND: "; std::cin>>cmndKH_;
+        std::cout<<"Nhap CMND: "; 
+        std::cin>>cmndKH_;
     }
 
     //Chuan hoa
     nameKH_ = Validation::trimAndStandardizeSpace(nameKH_);
     //khoi tao thong tin khach hang + ve
     KhachHang KH_ = KhachHang(idx_, Validation::chuanHoa(nameKH_), Validation::trimAndStandardizeSpace(cmndKH_));
-    Ve veKH_  = Ve(cbUserChon_.getMaCB() + std::to_string(numGhe + 1), cbUserChon_.getMaCB(),&cbUserChon_, numGhe, KH_);
+    Ve veKH_  = Ve(cbUserChon_->getMaCB() + std::to_string(numGhe + 1), cbUserChon_->getMaCB(),cbUserChon_, numGhe, KH_);
     
 
-    tmpDSVe_.push(veKH_); 
-    std::cout<<"Dat ve thanh cong!";
+    if (tmpDSVe_.push_back(veKH_)) {
+        std::cout<<"Dat ve thanh cong! SL="<<tmpDSVe_.getSize()<<std::endl;
+    }
+    else std::cout<<"Dat ve khong thanh cong!";
     Sleep(3000);
     std::system("cls");
 }
 
-void xuLyDatVe(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, std::vector<Ve>& dsVe_){
-    if(tmpDSVe_.size() == 0) {
+void xuLyDatVe(LinkedList<Ve>& tmpDSVe_, std::vector<Ve>& dsVe_){
+    if(tmpDSVe_.empty()) {
         std::cout<<"Hien tai chua co khach hang dat ve!";
         Sleep(2000); 
         return;
     }    
 
-    std::cout<<"So khach hang da dat ve: "<<tmpDSVe_.size()<<std::endl;
-    std::queue<Ve> copyDSVe_ = tmpDSVe_; 
-    while(!tmpDSVe_.empty()) {
-        Ve& tmp = tmpDSVe_.front(); 
-        tmp.getKhachHang().xuat();
-        tmp.xuat(); 
-        tmpDSVe_.pop(); 
-    }
+    std::cout<<"So khach hang da dat ve: "<<tmpDSVe_.getSize()<<std::endl;
+    tmpDSVe_.display(); 
+    
 
     std::cout<<"Nhap 'ok' de duyet tat ca! "<<std::endl; 
     std::string text; std::cin>>text; 
     if(text == "ok") {
-        while(!copyDSVe_.empty()){
-            Ve& nowVe_ = copyDSVe_.front(); copyDSVe_.pop(); 
+        while(!tmpDSVe_.empty()){
+            listNode<Ve>* nodeVe_ = tmpDSVe_.popFront(); 
+            Ve nowVe_ = nodeVe_->data; delete nodeVe_; 
+
             ChuyenBay* cbVe_  = nowVe_.getCB(); 
+            if(cbVe_->getStatus() != 1) {
+                std::cout<<"Ve "<<nowVe_.getMaVe()<<" da het ve, bi huy hoac da hoan thanh! Khong the duyet ve!"<<std::endl;
+                continue; 
+            } 
             if (cbVe_->kiemtraGheTrong(nowVe_.getSoGhe()) == false) {
                 std::cout<<"Ve "<<nowVe_.getMaVe()<<" da bi huy vi khong con ghe trong"<<std::endl;
                 continue;
             }
+            //Kiem tra ve do co phai la cuoi cung hay khong
+            if (cbVe_->dayVe()) {
+                cbVe_->setStatus(2);
+            }
             cbVe_->themVe(nowVe_);
-            dsVe_.push_back(nowVe_); 
-            dsKhachHang_.push_back(nowVe_.getKhachHang()); 
+            dsVe_.push_back(nowVe_);
         }
         FileStore::luuVe(dsVe_);
         std::cout<<"Da duyet tat ca";
     }
     else {
         std::cout<<"Thao tac chua duoc thuc hien"; 
-        tmpDSVe_ = copyDSVe_; 
     }
     Sleep(2000); 
 }
@@ -164,7 +188,7 @@ void xuatDSVe_(std::vector<Ve>& dsVe_, int sizeDSVe_){
             dsVe_[i].xuat(); 
         }
 }
-void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
+void xuLyTraVe(std::vector<Ve>& dsVe_){
     int sizeDSVe_ = dsVe_.size(); 
     if(sizeDSVe_ == 0){
         std::cout<<"Chua co ve nao duoc duyet!"<<std::endl;
@@ -176,7 +200,7 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
     while(true){
         std::cin>>q; 
         if(q!=2204){
-            if(q>sizeDSVe_) {
+            if(q>sizeDSVe_ || q <= 0) {
                 std::cout<<"Gia tri khong hop le!"<<std::endl;
             }
             else{ 
@@ -191,7 +215,6 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
                         if (dsVe_[i].getMaVe() == dsVe_[q-1].getMaVe()){
                             dsVe_.erase(dsVe_.begin() + i); 
                             sizeDSVe_--;
-                            xoaKhachHang(dsKhachHang_, dsVe_[q-1].getKhachHang().getCmnd());
                             break;
                         }
                     }
@@ -205,8 +228,10 @@ void xuLyTraVe(std::vector<Ve>& dsVe_, std::vector<KhachHang>& dsKhachHang_){
     }
     Sleep(2000); 
 }
-void thongKe(std::vector<KhachHang>& dsKhachHang_, ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_, MayBay* dsMayBay_, int sizeDSMayBay_){
+void thongKe(Tree<ChuyenBay>& dsChuyenBay_, int sizeDSChuyenBay_, MayBay* dsMayBay_, int sizeDSMayBay_){
     int q; 
+    std::vector<ChuyenBay*> dsCB_; 
+    dsChuyenBay_.getList(dsCB_); 
     while(true){
         std::system("cls");
         std::cout<<"Vui long chon option: "<<std::endl<<
@@ -214,14 +239,15 @@ void thongKe(std::vector<KhachHang>& dsKhachHang_, ChuyenBay* dsChuyenBay_, int 
             "2. Hien thi danh sach ghe con trong cua mot chuyen bay "<<std::endl<<
             "3. Thong ke so luong chuyen may cua mot may bay"<<std::endl;
         std::cin>>q;
+
         if(q==1) ThongKe::displayKHChuyenBay(dsChuyenBay_, sizeDSChuyenBay_);
         else if(q==2) ThongKe::displayDSGheTrong(dsChuyenBay_, sizeDSChuyenBay_); 
-        else if(q==3) ThongKe::displaySLChuyenBay(dsMayBay_, sizeDSMayBay_, dsChuyenBay_, sizeDSChuyenBay_);
+        else if(q==3) ThongKe::displaySLChuyenBay(dsMayBay_, sizeDSMayBay_, dsCB_, sizeDSChuyenBay_);
         else return; 
     }
 }
 
-void quanLy(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, std::vector<Ve>& dsVe_, ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_, MayBay* dsMayBay_, int sizeDSMayBay_) {
+void quanLy(LinkedList<Ve>& tmpDSVe_, std::vector<Ve>& dsVe_, Tree<ChuyenBay>& dsChuyenBay_, int sizeDSChuyenBay_, MayBay* dsMayBay_, int sizeDSMayBay_) {
     std::system("cls");
 
     std::string user, pass; 
@@ -263,9 +289,9 @@ void quanLy(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, std:
             "2. Xu ly tra ve"<<std::endl<<
             "3. Thong ke"<<std::endl;
         std::cin>>q;
-        if (q == 1) xuLyDatVe(tmpDSVe_, dsKhachHang_, dsVe_);
-        else if(q==2) xuLyTraVe(dsVe_, dsKhachHang_); 
-        else if (q==3) thongKe(dsKhachHang_, dsChuyenBay_, sizeDSChuyenBay_, dsMayBay_, sizeDSMayBay_); 
+        if (q == 1) xuLyDatVe(tmpDSVe_, dsVe_);
+        else if(q==2) xuLyTraVe(dsVe_); 
+        else if (q==3) thongKe(dsChuyenBay_, sizeDSChuyenBay_, dsMayBay_, sizeDSMayBay_); 
         else return; 
     };
 }
@@ -273,9 +299,10 @@ void quanLy(std::queue<Ve>& tmpDSVe_, std::vector<KhachHang>& dsKhachHang_, std:
 int main(){
     srand(time(0));
     MayBay* dsMayBay = new MayBay[100];
-    ChuyenBay* dsChuyenBay = new ChuyenBay[100];
-    std::vector<KhachHang> dsKhachHang; 
+    Tree<ChuyenBay> dsChuyenBay; 
+    // std::vector<KhachHang> dsKhachHang; 
     std::vector<Ve> dsVe_; 
+    LinkedList<Ve> tmpDSVe_;
 
     int sizeDSMayBay_ = 0;
     int sizeDSChuyenBay_ = 0;
@@ -285,7 +312,6 @@ int main(){
 
     int q = 0; 
     int cnt = 0;
-    std::queue<Ve> tmpDSVe_; 
     while(true){
         std::system("cls");
         cnt++; 
@@ -296,12 +322,11 @@ int main(){
         std::cin>>q; 
         if(q==1) hienThiDSChuyenBay(dsChuyenBay, sizeDSChuyenBay_); 
         else if (q==2) datVe(cnt, dsMayBay, sizeDSMayBay_, dsChuyenBay, sizeDSChuyenBay_, tmpDSVe_);
-        else if (q==3) quanLy(tmpDSVe_, dsKhachHang, dsVe_, dsChuyenBay, sizeDSChuyenBay_, dsMayBay, sizeDSMayBay_); 
+        else if (q==3) quanLy(tmpDSVe_, dsVe_, dsChuyenBay, sizeDSChuyenBay_, dsMayBay, sizeDSMayBay_); 
         else break; 
     }
 
     FileStore::cleanVe(dsVe_); 
     delete[] dsMayBay; 
-    delete[] dsChuyenBay; 
     return 0; 
 }

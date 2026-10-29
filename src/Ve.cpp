@@ -1,7 +1,5 @@
 #include "../include/Ve.h"
-// std::string maVe_, maChuyenBay_;
-// KhachHang khachHang_; 
-// int soGhe_; 
+
 //Constructor - Minh Tien 
 Ve::Ve(){
     maVe_ = "";
@@ -37,5 +35,22 @@ ChuyenBay* Ve::getCB() const {
 
 //Xuat xu ly
 void Ve::xuat() const {
-    std::cout<<"Ma ve: "<<maVe_<<" Ma Chuyen Bay: "<<maChuyenBay_<<" So ghe "<<soGhe_ + 1<<" KH: "<<khachHang_.getName()<<std::endl;
+    std::cout<<"Ma ve: "<<maVe_
+    <<" Ma Chuyen Bay: "<<maChuyenBay_
+    <<" So ghe "<<soGhe_ + 1
+    <<" KH: "<<khachHang_.getName()
+    <<" CMND: "<<khachHang_.getCmnd()<<std::endl;
+}
+
+std::ostream& operator<<(std::ostream& out, const Ve& p){
+    out<<"Ma ve: "<<p.maVe_<<" Ma Chuyen Bay: "<<p.maChuyenBay_<<" So ghe "<<p.soGhe_ + 1<<" KH: "<<p.khachHang_.getName()<<std::endl;
+    return out; 
+}
+
+bool Ve::operator==(const Ve& other) const {
+    return maVe_ == other.maVe_; 
+}
+
+bool Ve::operator!=(const Ve& other) const {
+    return !(*this==other); 
 }

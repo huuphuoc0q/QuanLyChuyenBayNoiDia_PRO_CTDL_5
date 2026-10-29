@@ -26,6 +26,10 @@ class Ve {
 
         //Xuat thong tin ve
         void xuat() const; 
+        friend std::ostream& operator<<(std::ostream& out, const Ve& obj);
+        //qua tai toan tu 
+        bool operator==(const Ve& other) const;
+        bool operator!=(const Ve& other) const;
 };
 
 #endif 

@@ -1,5 +1,4 @@
-hướng dẫn chạy: g++ -Iinclude src/main.cpp src/MayBay.cpp src/ChuyenBay.cpp src/FileStore.cpp src/ThongKe.cpp src/KhachHang.cpp src/Ve.cpp src/Validation.cpp -o main.exe
-chạy thực thi: .\main.exe
+hướng dẫn chạy: .\run.bat
 
 HƯỚNG DẪN QUY TRÌNH LÀM VIỆC GITHUB: 
 1. Lấy toàn bộ code mới nhất về máy: git pull origin main

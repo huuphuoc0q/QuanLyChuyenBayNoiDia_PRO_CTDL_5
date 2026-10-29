@@ -4,6 +4,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<iomanip>
 #include "Ve.h"
 #include "MayBay.h"
 class ChuyenBay {
@@ -38,7 +39,15 @@ class ChuyenBay {
         void themVe(const Ve& ve_);
         void xoaVe(const std::string& maVe_);
         void xuat() const; 
+        bool dayVe() const; 
+        
+        //Qua tai toan tu so sanh 
+        bool operator<(const ChuyenBay& other) const; 
+        bool operator==(const ChuyenBay& other) const; 
+        bool operator>(const ChuyenBay& other) const ;
 
+        //Qua tai xuat
+        friend std::ostream& operator<<(std::ostream& os, const ChuyenBay& cb);
 };
 
 #endif

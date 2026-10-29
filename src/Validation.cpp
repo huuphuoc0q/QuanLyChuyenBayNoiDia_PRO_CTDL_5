@@ -53,7 +53,7 @@ namespace Validation {
             return false;
         }
         for (char c : soHieuMB) {
-            if (!std::isalnum(static_cast<unsigned char>(c)) || c != '-') {
+            if (!std::isalnum(static_cast<unsigned char>(c)) && c != '-') {
                 return false;
             }
         }
@@ -68,5 +68,9 @@ namespace Validation {
             else s[i] = tolower(s[i]); 
         }
         return s; 
+    }
+
+    bool inValue(int value, int min_, int max_){
+        return (value >= min_ && value <= max_);
     }
 }
