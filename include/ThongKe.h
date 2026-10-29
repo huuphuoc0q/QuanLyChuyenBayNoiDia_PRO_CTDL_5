@@ -1,16 +1,18 @@
 #ifndef THONGKE_H
-#define THONGKE_
+#define THONGKE_H
 #include "../include/KhachHang.h"
 #include "../include/ChuyenBay.h"
+#include "../include/Validation.h"
+#include "../include/BST.h"
 #include <iostream>
 #include <vector>
 #include <string>
 
 
 namespace ThongKe{
-    void displayKHChuyenBay(ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_);
-    void displayDSGheTrong(ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_);
-    void displaySLChuyenBay(MayBay* dsMayBay_, int sizeDSMayBay_, ChuyenBay* dsChuyenBay_, int sizeDSChuyenBay_);
+    void displayKHChuyenBay(Tree<ChuyenBay>& dsChuyenBay_, int sizeDSChuyenBay_);
+    void displayDSGheTrong(Tree<ChuyenBay>& dsChuyenBay_, int sizeDSChuyenBay_);
+    void displaySLChuyenBay(MayBay* dsMayBay_, int sizeDSMayBay_, std::vector<ChuyenBay*>& dsCB_, int sizeDSChuyenBay_);
 }
 
 #endif 

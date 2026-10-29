@@ -4,20 +4,20 @@
 #include "Ve.h"
 
 template<typename TypeData>
-struct Node {
+struct listNode {
     TypeData data; 
-    Node* pNext; 
-    Node(const TypeData& value_) {
+    listNode* next; 
+    listNode(const TypeData& value_) {
         data = value_; 
-        pNext = nullptr; 
+        next = nullptr; 
     }
 };
 
 template<typename TypeData>
 class LinkedList {
     private: 
-        Node<TypeData>* pHead; 
-        Node<TypeData>* pTail; 
+        listNode<TypeData>* pHead; 
+        listNode<TypeData>* pTail; 
         int sizeLinkedList; 
     public: 
         LinkedList() {
@@ -27,64 +27,73 @@ class LinkedList {
         }; 
         ~LinkedList() {
             while(pHead!=nullptr){
-                Node<TypeData>* tmp = pHead; 
+                listNode<TypeData>* tmp = pHead; 
                 pHead = pHead->next; 
                 delete tmp; 
             }
             pTail = nullptr;
-            sizeLinkedList = nullptr; 
+            sizeLinkedList = 0; 
         }; 
 
         //Thao tac xu ly linked list; 
-        void push_back(const TypeData& value_) {
-            Node<TypeData>* pNew = new Node<TypeData>(value_);
+        bool push_back(const TypeData& value_) {
+            listNode<TypeData>* pNew = new listNode<TypeData>(value_);
+            if(pNew == nullptr) return false; 
             if(sizeLinkedList == 0) {
                 pHead = pNew; 
                 pTail = pNew; 
-                return; 
+                sizeLinkedList++; 
+                return true;
             } 
             pTail->next = pNew; 
             pTail = pNew; 
             sizeLinkedList++; 
+            return true; 
         } 
-        Node<TypeData>* popFront(){
+        listNode<TypeData>* popFront(){
             if(sizeLinkedList==0) {
                 return nullptr; 
             }
 
-            Node<TypeData>* tmp = pHead; 
+            listNode<TypeData>* tmp = pHead; 
             pHead = pHead->next; 
             if(pHead == nullptr) pTail = nullptr; 
             sizeLinkedList--; 
             return tmp; 
         }   
 
+        bool empty() const {
+            return sizeLinkedList == 0; 
+        }
+        int getSize() const {
+            return sizeLinkedList; 
+        }
         bool removeVe(const TypeData& value_) {
             if(sizeLinkedList == 0) return false;
 
-            Node<TypeData>* nodeCurr = pHead;
-            Node<TypeData>* nodePre = pHead; 
-            while(nodeCurr!=nullptr && nodeCurr->data!=value_) {
-                nodePre = nodeCurr; 
-                nodeCurr = nodeCurr->next;
+            listNode<TypeData>* listNodeCurr = pHead;
+            listNode<TypeData>* listNodePre = pHead; 
+            while(listNodeCurr!=nullptr && listNodeCurr->data!=value_) {
+                listNodePre = listNodeCurr; 
+                listNodeCurr = listNodeCurr->next;
             }
 
-            if(nodeCurr==nullptr) return false;
+            if(listNodeCurr==nullptr) return false;
             
-            if (nodeCurr == pHead) {
+            if (listNodeCurr == pHead) {
                 pHead = pHead->next; 
                 if(sizeLinkedList==1) {
                     pTail = nullptr;
                 }
             }
             else {
-                nodePre->next = nodeCurr->next;
-                if(nodeCurr == pTail) {
-                    pTail = nodePre; 
+                listNodePre->next = listNodeCurr->next;
+                if(listNodeCurr == pTail) {
+                    pTail = listNodePre; 
                 }
             }
 
-            delete nodeCurr; 
+            delete listNodeCurr; 
             sizeLinkedList--; 
             return true; 
         } 
@@ -94,9 +103,9 @@ class LinkedList {
                 return; 
             }
 
-            Node<TypeData>* tmp = pHead;
+            listNode<TypeData>* tmp = pHead;
             while(tmp!=nullptr){
-                std::cout<<tmp->data<<" "; 
+                std::cout<<tmp->data; 
                 tmp = tmp->next; 
             }
         }
