@@ -69,8 +69,5 @@ namespace Validation {
         }
         return s; 
     }
-
-    bool inValue(int value, int min_, int max_){
-        return (value >= min_ && value <= max_);
-    }
+    
 }

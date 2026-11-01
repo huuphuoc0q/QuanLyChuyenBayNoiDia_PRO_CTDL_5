@@ -4,6 +4,7 @@
 #include "../include/ChuyenBay.h"
 #include "../include/Validation.h"
 #include "../include/BST.h"
+#include "../include/UI_Menu.h"
 #include <iostream>
 #include <vector>
 #include <string>

@@ -1,9 +1,4 @@
 #include "FileStore.h"
-#include<string>
-#include<iostream>
-#include<fstream>
-#include<vector>
-
 
 void FileStore::loadMayBay(MayBay* dsMayBay, int& sizeDSMayBay) {
     std::ifstream fi("data/MayBay.txt"); 
