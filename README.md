@@ -53,7 +53,7 @@ Chạy chương trình sau khi biên dịch:
 ```text
 include/        Các khai báo lớp và cấu trúc dữ liệu
 src/            Mã nguồn chương trình
-data/           Dữ liệu máy bay, chuyến bay, khách hàng và vé
+data/           Dữ liệu máy bay, chuyến bay, khách hàng
 data/DATA_VE/   Các tệp thông tin vé
 docs/           Tài liệu tham khảo của dự án
 run.bat         Tập lệnh biên dịch và chạy trên Windows
@@ -75,6 +75,7 @@ Chương trình đọc dữ liệu tương đối từ thư mục làm việc hi
 - `data/MayBay.txt`: mỗi dòng gồm mã máy bay và số chỗ.
 - `data/ChuyenBay.txt`: mỗi dòng gồm mã chuyến bay, mã máy bay, thời gian khởi hành, sân bay đến và một giá trị trạng thái.
 - `data/Admin.txt`: tài khoản dùng để đăng nhập khu vực quản lý.
+- `data/KhachHang.txt`: mỗi dòng gồm số thứ tự khách hàng, tên khách hàng, số cccd, mã vé, mã chuyến bay, số ghế chọn.
 - `data/DATA_VE/`: nơi chương trình ghi tệp thông tin vé sau khi duyệt.
 
 ## Lưu ý về trạng thái dữ liệu
