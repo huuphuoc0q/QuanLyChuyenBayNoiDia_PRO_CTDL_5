@@ -170,14 +170,6 @@ void UI_Menu::printTable(const std::vector<ChuyenBay*>& danhSach) {
         setColor(15); std::cout << std::setw(wSanBay - 1) << cb->getSanBD();
 
         setColor(11); std::cout << "│ ";
-        // if (cb->getStatus() == 1) {
-        //     // std::cout<<"\033[42;30m";
-        //     setColor(32);
-        // }      
-        // else if (cb->getStatus() == 3) setColor(11);  // Cyan sáng
-        // else if (cb->getStatus() == 2) setColor(14);    // Vàng sáng
-        // else if (cb->getStatus() == 0) setColor(12); // Đỏ sáng
-        // else setColor(15);
 
         std::string textStatus_ = "";
         switch(cb->getStatus()){
