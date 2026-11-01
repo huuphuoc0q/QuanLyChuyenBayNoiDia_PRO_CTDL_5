@@ -114,6 +114,7 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, Tree<ChuyenBay>& dsChu
     }
     while(Validation::empty(cmndKH_) || !Validation::validCMND(cmndKH_)){
         if(!(UI_Menu::inputPrint_("Nhập số căn cước công dân", cmndKH_))) return;
+        if (!(Validation::validCMND(cmndKH_))) std::cout<<"So can cuoc cong dan phai du 12 ki tu, bao gom ki tu so"<<"\n";
     }
 
     //Chuan hoa
@@ -124,7 +125,8 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, Tree<ChuyenBay>& dsChu
     
 
     if (tmpDSVe_.push_back(veKH_)) {
-        std::cout<<"Dat ve thanh cong! SL="<<tmpDSVe_.getSize()<<std::endl;
+        std::cout<<"Dat ve thanh cong!"<<std::endl;
+
     }
     else std::cout<<"Dat ve khong thanh cong!";
     Sleep(3000);
@@ -172,6 +174,7 @@ void xuLyDatVe(LinkedList<Ve>& tmpDSVe_, std::vector<Ve>& dsVe_){
                 dsVe_.push_back(nowVe_);
             }
             FileStore::luuVe(dsVe_);
+            FileStore::luuThongTinKH(dsVe_);
             if (!(UI_Menu::inputPrint_("Da duyet ve thanh cong, nhap phim bat ki de thoat", userInput))) return; 
             else return; 
         }
@@ -234,6 +237,7 @@ void xuLyTraVe(std::vector<Ve>& dsVe_){
                 }
                 
                 FileStore::luuVe(dsVe_);
+                FileStore::luuThongTinKH(dsVe_);
                 std::cout<<"Xoa ve thanh cong!"<<std::endl; 
             }
         }

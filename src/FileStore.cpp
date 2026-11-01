@@ -78,10 +78,16 @@ void FileStore::loadKhachHang(std::vector<KhachHang>& dsKhachHang, int& sizeKhac
     fi.close(); 
 }
 
-
-void FileStore::luuThongTinKH(const KhachHang& khachHang_) {
-    std::ofstream fo("data/KhachHang.txt", std::ios::app); 
-    fo<<khachHang_.getStt()<<" "<<khachHang_.getName()<<" "<<khachHang_.getCmnd()<<std::endl;
+void FileStore::luuThongTinKH(const std::vector<Ve>& dsVe_) {
+    std::ofstream fo("data/KhachHang.txt", std::ios::out | std::ios::trunc); 
+    for(int i = 0; i<dsVe_.size(); i++) {
+        fo << dsVe_[i].getKhachHang().getStt()<< " "
+        << dsVe_[i].getKhachHang().getName() <<" "
+        << dsVe_[i].getKhachHang().getCmnd() <<" "
+        << dsVe_[i].getMaVe() <<" "
+        << dsVe_[i].getMaCB() <<" "
+        << dsVe_[i].getSoGhe() + 1 <<" " <<std::endl;
+    }
     fo.close(); 
 }
 
@@ -107,6 +113,7 @@ void FileStore::cleanVe(std::vector<Ve>& dsVe){
     for(int i = 0; i<sizeDSVe_; i++) {
         xoaVe(dsVe[i].getMaVe());
     }
+    std::ofstream("data/KhachHang.txt", std::ios::trunc);
 }
 
 

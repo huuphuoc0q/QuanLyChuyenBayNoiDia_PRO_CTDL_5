@@ -17,7 +17,7 @@ namespace FileStore {
     void loadChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay, MayBay* &dsMayBay, int& sizeDSMayBay);
     void loadKhachHang( std::vector<KhachHang>& dsKhachHang, int& sizeKhachHang_);
 
-    void luuThongTinKH(const KhachHang& khachHang_);  
+    void luuThongTinKH(const std::vector<Ve>& dsVe_);  
     void luuVe(std::vector<Ve>& dsVe);
     void xoaVe(std::string maVe_);
     void cleanVe(std::vector<Ve>& dsVe); 
