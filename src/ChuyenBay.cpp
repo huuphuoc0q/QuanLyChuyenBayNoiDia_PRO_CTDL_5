@@ -161,11 +161,11 @@ std::ostream& operator<<(std::ostream& os, const ChuyenBay& cb) {
     }
     // 2. Chèn colorCode ở ĐẦU và resetCode ở CUỐI lệnh in
     os << colorCode
-    << std::setw(16) << cb.maChuyenBay_
-    << std::setw(22) << cb.ngayKhoiHanh_
-    << std::setw(15) << cb.sanBayDen_
-    << std::setw(15) << textStatus_
-    << std::setw(15) << textDSVe_
+    << "  " << std::setw(15) << cb.maChuyenBay_
+    << "  " << std::setw(21) << cb.ngayKhoiHanh_
+    << "  " << std::setw(14) << cb.sanBayDen_
+    << "  " << std::setw(14) << textStatus_
+    << "  " << std::setw(60) << textDSVe_
     << resetCode;
     return os;
 }

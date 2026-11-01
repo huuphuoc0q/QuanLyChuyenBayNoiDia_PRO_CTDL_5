@@ -7,7 +7,7 @@ echo     DANG BIEN DICH DU AN QUAN LY CHUYEN BAY
 echo ===================================================
 
 
-g++ -std=c++11 -Iinclude src/main.cpp src/MayBay.cpp src/ChuyenBay.cpp src/FileStore.cpp src/ThongKe.cpp src/KhachHang.cpp src/Ve.cpp src/Validation.cpp -o main.exe
+g++ -std=c++11 -Iinclude src/main.cpp src/UI_Menu.cpp src/MayBay.cpp src/ChuyenBay.cpp src/FileStore.cpp src/ThongKe.cpp src/KhachHang.cpp src/Ve.cpp src/Validation.cpp -o main.exe
 if %errorlevel% equ 0 (
     echo.
     echo [THANH CONG] Bien dich hoan tat!

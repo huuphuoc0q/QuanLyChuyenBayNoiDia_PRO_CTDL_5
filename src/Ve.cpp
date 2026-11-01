@@ -43,7 +43,13 @@ void Ve::xuat() const {
 }
 
 std::ostream& operator<<(std::ostream& out, const Ve& p){
-    out<<"Ma ve: "<<p.maVe_<<" Ma Chuyen Bay: "<<p.maChuyenBay_<<" So ghe "<<p.soGhe_ + 1<<" KH: "<<p.khachHang_.getName()<<std::endl;
+    // out<<"Ma ve: "<<p.maVe_<<" Ma Chuyen Bay: "<<p.maChuyenBay_<<" So ghe "<<p.soGhe_ + 1<<" KH: "<<p.khachHang_.getName()<<std::endl;
+    out
+    << "  " << std::setw(9) << p.maVe_
+    << "  " << std::setw(15) << p.maChuyenBay_
+    << "  " << std::setw(7) << p.soGhe_ + 1
+    << "  " << std::setw(24) << p.khachHang_.getName()
+    << "  " << std::setw(13) << p.khachHang_.getCmnd() <<"\n";
     return out; 
 }
 

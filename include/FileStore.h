@@ -5,6 +5,8 @@
 #include<string>
 #include<cstdio>
 #include<iostream>
+#include<vector>
+
 #include "MayBay.h"
 #include "ChuyenBay.h"
 #include "KhachHang.h"
