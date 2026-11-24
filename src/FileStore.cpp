@@ -1,5 +1,13 @@
 #include "FileStore.h"
 
+std::vector<KhachHang> dsKhachHang = {
+    KhachHang(1, "Nguyen Minh Quan", "079204001234"),
+    KhachHang(2, "Tran Thi Thanh Thao", "084305005678"),
+    KhachHang(3, "Le Hoang Phuc", "001203009012"),
+    KhachHang(4, "Pham Ngoc Mai Anh", "048304003456"),
+    KhachHang(5, "Vo Quoc Bao", "092202007890")
+};
+
 void FileStore::loadMayBay(MayBay* dsMayBay, int& sizeDSMayBay) {
     std::ifstream fi("data/MayBay.txt"); 
     sizeDSMayBay = 0; 
@@ -22,7 +30,7 @@ void FileStore::loadChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay
     int st = 0; 
 
     while(fi>>maCB>>soHieu>>ngay>>sanDen>>st) {
-        int ranDomST = rand() % 4 + 1; 
+        const int trangThai = rand() % 4;
         MayBay* mbCB = nullptr;
         for(int i = 0; i<sizeDSMayBay; i++){
             if(dsMayBay[i].getSoHieu() == soHieu){
@@ -30,36 +38,36 @@ void FileStore::loadChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay
                 break; 
             }
         } 
-        ChuyenBay cbHienTai = ChuyenBay(maCB, mbCB, soHieu, ngay, sanDen, ranDomST - 1);
+        ChuyenBay cbHienTai = ChuyenBay(maCB, mbCB, soHieu, ngay, sanDen, trangThai);
         if (mbCB == nullptr) continue;  
         int soCho_ = mbCB->getSoCho();
-
-        switch(ranDomST - 1){
-            case 0: //Huy chuyen
-                break;
-            case 1: { // Con ve 
-                cbHienTai.khoiTaoGheTrong(soCho_, 0);
-                for(int i = 0; i<soCho_/2; i++){
-                    int ranDomSoGhe_ = rand() % soCho_ + 1; 
-                    cbHienTai.xoaGheTrong(ranDomSoGhe_-1);
-                }
-                break; 
-            }
-            case 2: //Het ve
-                {
-                    cbHienTai.khoiTaoGheTrong(soCho_, 1);
-                    break;
-                }
-            case 3: //Hoan tat
-                {
-                    cbHienTai.khoiTaoGheTrong(soCho_, 1);
-                    break;
-                }
-            default: 
-                break;
-        }
+        cbHienTai.khoiTaoGheTrong(soCho_, 0);
         dsChuyenBay.insert(cbHienTai); 
         sizeDSChuyenBay++;
+
+        if (trangThai == 0) continue;
+
+        Node<ChuyenBay>* nodeCB = dsChuyenBay.search(cbHienTai);
+        if (nodeCB == nullptr) continue;
+
+        ChuyenBay& chuyenBayDaLuu = nodeCB->data_;
+        const int soKhachMau = static_cast<int>(dsKhachHang.size()) < soCho_
+            ? static_cast<int>(dsKhachHang.size())
+            : soCho_;
+        for (int i = 0; i < soKhachMau; ++i) {
+            const int soGhe = i;
+            Ve veMau(maCB + std::to_string(soGhe + 1), maCB, &chuyenBayDaLuu,
+                     soGhe, dsKhachHang[i]);
+            chuyenBayDaLuu.themVe(veMau);
+        }
+
+        if (trangThai == 2 || trangThai == 3) {
+            for (int i = 0; i < soCho_; ++i) {
+                if (chuyenBayDaLuu.kiemtraGheTrong(i)) {
+                    chuyenBayDaLuu.xoaGheTrong(i);
+                }
+            }
+        }
     }
     fi.close(); 
 }

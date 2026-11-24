@@ -1,6 +1,8 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <vector>
+
 #include "Ve.h"
 
 template<typename TypeData>
@@ -67,6 +69,14 @@ class LinkedList {
         }
         int getSize() const {
             return sizeLinkedList; 
+        }
+        void getList(std::vector<TypeData>& res) const {
+            res.clear();
+            const listNode<TypeData>* current = pHead;
+            while (current != nullptr) {
+                res.push_back(current->data);
+                current = current->next;
+            }
         }
         bool removeVe(const TypeData& value_) {
             if(sizeLinkedList == 0) return false;
