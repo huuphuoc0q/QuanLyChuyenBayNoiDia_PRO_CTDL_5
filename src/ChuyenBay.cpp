@@ -159,8 +159,10 @@ std::ostream& operator<<(std::ostream& os, const ChuyenBay& cb) {
     for(auto i: cb.dsVe_){
         textDSVe_ += (i.getMaVe() + " "); 
     }
+
     // 2. Chèn colorCode ở ĐẦU và resetCode ở CUỐI lệnh in
-    os << colorCode
+    os << std::string(8, ' ')
+    << colorCode 
     << "  " << std::setw(15) << cb.maChuyenBay_
     << "  " << std::setw(21) << cb.ngayKhoiHanh_
     << "  " << std::setw(14) << cb.sanBayDen_
