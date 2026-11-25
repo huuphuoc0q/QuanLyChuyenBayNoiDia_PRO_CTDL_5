@@ -1,5 +1,7 @@
 #include "UI_Menu.h"
 
+#include <algorithm>
+
 const INT SIZE_KHUNG = 150; 
 const std::string MENU_COLOR = "\033[38;5;154m";
 const std::string MAU_RESET = "\033[38;5;231m";
@@ -253,11 +255,11 @@ void UI_Menu::printOption(std::string title, std::vector<std::string>& option){
 
 void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
     SetConsoleOutputCP(65001); 
-
-    int wStt = 6, wMa = 16, wNgay = 22, wSanBay = 15, wTrangThai = 15, wDSVe = 60;
+    const INT pad = 3;
+    int wStt = 6, wMa = 16, wNgay = 22, wSanBay = 15, wTrangThai = 15, wDSVe = 63;
 
     setColor(11);
-    std::cout << std::string(8, ' ')
+    std::cout << std::string(pad, ' ')
               << "┌" << repeatStr("─", wStt) << "┬"
               << repeatStr("─", wMa) << "┬"
               << repeatStr("─", wNgay) << "┬"
@@ -265,7 +267,7 @@ void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
               << repeatStr("─", wTrangThai) << "┬"
               << repeatStr("─", wDSVe) << "┐\n";
 
-    std::cout << std::string(8, ' ')
+    std::cout << std::string(pad, ' ')
               << "│ " << std::left << std::setw(wStt - 1) << "STT"
               << "│ " << std::setw(wMa + 2) << "Mã chuyến bay"
               << "│ " << std::setw(wNgay + 3) << "Ngày khởi hành"
@@ -276,7 +278,7 @@ void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
               
 
     setColor(11);
-    std::cout << std::string(8, ' ')
+    std::cout << std::string(pad, ' ')
               << "├" << repeatStr("─", wStt) << "┼"
               << repeatStr("─", wMa) << "┼"
               << repeatStr("─", wNgay) << "┼"
@@ -284,13 +286,12 @@ void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
               << repeatStr("─", wTrangThai) << "┼"
               << repeatStr("─", wDSVe) << "┤\n";
 
-    // dsChuyenBay.xuat();
     std::vector<ChuyenBay*> danhSach;
     dsChuyenBay.getList(danhSach);
     int stt = 1;
     for (const auto& cb : danhSach) {
         int colorStatus = 15; 
-        std::cout<<std::string(8, ' ');
+        std::cout<<std::string(pad, ' ');
         switch(cb->getStatus()) {
             case 0: 
                 colorStatus = 12; 
@@ -364,9 +365,13 @@ void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
         if (dsVe.empty()) dsVe_Str = "Không có thông tin";
         else {
             for(int i = 0; i<dsVe.size() - 1; i++) {
+                if (i == 6) break;
                 dsVe_Str = dsVe_Str + dsVe[i].getMaVe() + ", ";
             }
-            dsVe_Str += dsVe[dsVe.size() - 1].getMaVe(); 
+            if (dsVe.size()>=7) 
+                dsVe_Str += dsVe[6].getMaVe(); 
+            else 
+                dsVe_Str += dsVe[dsVe.size() - 1].getMaVe(); 
         }
 
 
@@ -377,7 +382,7 @@ void UI_Menu::printTableDSCB(Tree<ChuyenBay>& dsChuyenBay){
     }
 
     setColor(11);
-    std::cout<<std::string(8, ' '); 
+    std::cout<<std::string(pad, ' '); 
     std::cout << "└" << repeatStr("─", wStt) << "┴"
             << repeatStr("─", wMa) << "┴" 
             << repeatStr( "─", wNgay) << "┴" 
@@ -518,7 +523,7 @@ int UI_Menu::selectSeatInteractive(int totalSeats, const std::vector<int>& seatS
 
         printTitle("SƠ ĐỒ CHỌN GHẾ MÁY BAY " + maCB);
 
-        std::cout << seatMapIndent << "      A     B     C           D     E     F \n";
+        std::cout << seatMapIndent << "      A     B     C         D     E     F \n";
         std::cout << seatMapIndent << "   ┌─────┬─────┬─────┐   ┌─────┬─────┬─────┐\n";
 
         for (int r = startRow; r < startRow + VISIBLE_ROWS && r < rows; ++r) {
@@ -614,93 +619,170 @@ void UI_Menu::showPopup(const std::string& message, bool isSuccess) {
 }
 
 void UI_Menu::showPopup(const std::string& message, PopupType type) {
+    std::cout.flush();
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO screenInfo;
-    GetConsoleScreenBufferInfo(hConsole, &screenInfo);
+    if (!GetConsoleScreenBufferInfo(hConsole, &screenInfo)) {
+        std::cerr << "Lỗi popup: không thể đọc thông tin màn hình console.\n";
+        return;
+    }
+
+    CONSOLE_CURSOR_INFO originalCursorInfo;
+    if (!GetConsoleCursorInfo(hConsole, &originalCursorInfo)) {
+        std::cerr << "Lỗi popup: không thể đọc trạng thái con trỏ console.\n";
+        return;
+    }
 
     SMALL_RECT windowRegion = screenInfo.srWindow;
-    const SHORT snapshotWidth = windowRegion.Right - windowRegion.Left + 1;
-    const SHORT snapshotHeight = windowRegion.Bottom - windowRegion.Top + 1;
-    std::vector<CHAR_INFO> screenSnapshot(snapshotWidth * snapshotHeight);
-    COORD snapshotSize = {snapshotWidth, snapshotHeight};
-    COORD snapshotOrigin = {0, 0};
+    const int viewportWidth = windowRegion.Right - windowRegion.Left + 1;
+    const int viewportHeight = windowRegion.Bottom - windowRegion.Top + 1;
+    if (viewportWidth < 12 || viewportHeight < 7) {
+        std::cerr << "Lỗi popup: cửa sổ console quá nhỏ để hiển thị popup.\n";
+        return;
+    }
 
-    ReadConsoleOutputW(hConsole, screenSnapshot.data(), snapshotSize, snapshotOrigin, 
-        &windowRegion);
-
-    const int popupWidth = 54;
+    const SHORT popupWidth = static_cast<SHORT>(std::min(54, viewportWidth));
     const int popupInnerWidth = popupWidth - 2;
-    const std::string indent((SIZE_KHUNG - popupWidth) / 2, ' ');
+    const int messageWidth = popupInnerWidth - 4;
+    std::vector<std::string> messageLines = wrapText(message, messageWidth);
+    const int maxMessageLines = viewportHeight - 6;
+    if (static_cast<int>(messageLines.size()) > maxMessageLines) {
+        messageLines.resize(maxMessageLines);
+        std::string& lastLine = messageLines.back();
+        auto removeLastCodePoint = [](std::string& line) {
+            if (line.empty()) return;
+            std::size_t start = line.size() - 1;
+            while (start > 0 &&
+                   (static_cast<unsigned char>(line[start]) & 0xC0) == 0x80) {
+                --start;
+            }
+            line.erase(start);
+        };
+        while (!lastLine.empty() &&
+               static_cast<int>(displayWidth(lastLine)) + 3 > messageWidth) {
+            removeLastCodePoint(lastLine);
+        }
+        lastLine += "...";
+    }
+
+    const SHORT popupHeight = static_cast<SHORT>(messageLines.size() + 6);
+    const SHORT startX = static_cast<SHORT>(
+        windowRegion.Left + (viewportWidth - popupWidth) / 2);
+    const SHORT startY = static_cast<SHORT>(
+        windowRegion.Top + (viewportHeight - popupHeight) / 2);
+    SMALL_RECT popupRegion = {
+        startX,
+        startY,
+        static_cast<SHORT>(startX + popupWidth - 1),
+        static_cast<SHORT>(startY + popupHeight - 1)
+    };
+
+    COORD snapshotSize = {popupWidth, popupHeight};
+    COORD snapshotOrigin = {0, 0};
+    std::vector<CHAR_INFO> screenSnapshot(
+        static_cast<std::size_t>(popupWidth) * popupHeight);
+    if (!ReadConsoleOutputW(hConsole, screenSnapshot.data(), snapshotSize,
+                            snapshotOrigin, &popupRegion)) {
+        std::cerr << "Lỗi popup: không thể lưu vùng màn hình phía sau popup.\n";
+        return;
+    }
+
     const std::string title = type == POPUP_SUCCESS
         ? "THÀNH CÔNG"
         : (type == POPUP_WARNING ? "CẢNH BÁO" : "THẤT BẠI");
-    const int titleColor = type == POPUP_SUCCESS ? 10 : (type == POPUP_WARNING ? 14 : 12);
-    const std::string buttonBackground = type == POPUP_SUCCESS
-        ? "\033[30;42m"
-        : (type == POPUP_WARNING ? "\033[30;43m" : "\033[30;41m");
+    const WORD borderColor = static_cast<WORD>(
+        type == POPUP_SUCCESS ? 10 : (type == POPUP_WARNING ? 14 : 12));
+    const WORD buttonColor = static_cast<WORD>(
+        (type == POPUP_SUCCESS ? 2 : (type == POPUP_WARNING ? 6 : 4)) << 4);
+    const WORD textColor = 7;
 
-    hideCursor();
-    clearScreen();
+    auto moveToPopupRow = [&](SHORT rowOffset) {
+        std::cout.flush();
+        COORD position = {startX, static_cast<SHORT>(startY + rowOffset)};
+        SetConsoleCursorPosition(hConsole, position);
+    };
+    auto applyColor = [&](WORD color) {
+        std::cout.flush();
+        SetConsoleTextAttribute(hConsole, color);
+    };
+    auto centeredLine = [](const std::string& text, int width) {
+        const std::string left = centeredPadding(text, width);
+        const int rightLength =
+            width - static_cast<int>(displayWidth(text)) - static_cast<int>(left.size());
+        return left + text + std::string(std::max(0, rightLength), ' ');
+    };
 
-    std::cout << "\n\n";
-    setColor(titleColor);
-    std::cout << indent << "╔" << repeatStr("═", popupInnerWidth) << "╗\n";
-    std::cout << indent << "║" << centeredPadding(title, popupInnerWidth)
-              << title << repeatStr(" ", popupInnerWidth - static_cast<int>(displayWidth(title)) -
-                                     static_cast<int>(centeredPadding(title, popupInnerWidth).size()))
-              << "║\n";
-    setColor(titleColor);
-    std::cout << indent << "╠" << repeatStr("═", popupInnerWidth) << "╣\n";
-    setColor(7);
-
-    const int messageWidth = popupInnerWidth - 4;
-    std::vector<std::string> messageLines = wrapText(message, messageWidth);
-    for (const std::string& messageLine : messageLines) {
-        std::cout << indent;
-        setColor(titleColor);
-        std::cout << "║";
-        setColor(7);
-        std::cout << " " << centeredPadding(messageLine, popupInnerWidth - 2)
-                  << messageLine << repeatStr(" ",
-                      popupInnerWidth - 2 - static_cast<int>(displayWidth(messageLine)) -
-                      static_cast<int>(centeredPadding(messageLine, popupInnerWidth - 2).size()))
-                  << " ";
-        setColor(titleColor);
-        std::cout << "║\n";
-        setColor(7);
+    CONSOLE_CURSOR_INFO hiddenCursorInfo = originalCursorInfo;
+    hiddenCursorInfo.bVisible = FALSE;
+    if (!SetConsoleCursorInfo(hConsole, &hiddenCursorInfo)) {
+        std::cerr << "Lỗi popup: không thể ẩn con trỏ console.\n";
+        return;
     }
 
-    setColor(titleColor);
-    std::cout << indent << "╠" << repeatStr("═", popupInnerWidth) << "╣\n";
-    setColor(7);
+    SHORT currentRow = 0;
+    std::cout.flush();
+    applyColor(borderColor);
+    moveToPopupRow(currentRow++);
+    std::cout << "╔" << repeatStr("═", popupInnerWidth) << "╗";
+
+    moveToPopupRow(currentRow++);
+    std::cout << "║" << centeredLine(title, popupInnerWidth) << "║";
+
+    moveToPopupRow(currentRow++);
+    std::cout << "╠" << repeatStr("═", popupInnerWidth) << "╣";
+
+    for (const std::string& messageLine : messageLines) {
+        moveToPopupRow(currentRow++);
+        applyColor(borderColor);
+        std::cout << "║";
+        applyColor(textColor);
+        std::cout << " " << centeredLine(messageLine, popupInnerWidth - 2) << " ";
+        applyColor(borderColor);
+        std::cout << "║";
+    }
+
+    moveToPopupRow(currentRow++);
+    applyColor(borderColor);
+    std::cout << "╠" << repeatStr("═", popupInnerWidth) << "╣";
+
     const std::string okText = "[ OK ]";
-    std::cout << indent;
-    setColor(titleColor);
+    const std::string okPadding = centeredPadding(okText, popupInnerWidth);
+    const int okRightLength = popupInnerWidth -
+        static_cast<int>(displayWidth(okText)) - static_cast<int>(okPadding.size());
+    moveToPopupRow(currentRow++);
+    applyColor(borderColor);
     std::cout << "║";
-    setColor(7);
-    std::cout << centeredPadding(okText, popupInnerWidth)
-              << buttonBackground << okText
-              << "\033[0m" << repeatStr(" ",
-                  popupInnerWidth - static_cast<int>(displayWidth(okText)) -
-                  static_cast<int>(centeredPadding(okText, popupInnerWidth).size()));
-    setColor(titleColor);
-    std::cout << "║\n";
-    std::cout << indent << "╚" << repeatStr("═", popupInnerWidth) << "╝\n";
-    setColor(7);
-    std::cout << "\n";
+    applyColor(textColor);
+    std::cout << okPadding;
+    applyColor(buttonColor);
+    std::cout << okText;
+    applyColor(textColor);
+    std::cout << std::string(std::max(0, okRightLength), ' ');
+    applyColor(borderColor);
+    std::cout << "║";
+
+    moveToPopupRow(currentRow);
+    std::cout << "╚" << repeatStr("═", popupInnerWidth) << "╝";
+    std::cout.flush();
 
     while (true) {
         int key = _getch();
-        if (key == KEY_ENTER) break;
-        if (key == 0 || key == 224) {
-            _getch();
-        }
+        if (key == KEY_ENTER || key == KEY_ESC) break;
+        if (key == 0 || key == 224) _getch();
     }
-    std::cout<<MAU_RESET; 
-    showCursor();
-    setColor(7);
-    WriteConsoleOutputW(hConsole, screenSnapshot.data(), snapshotSize, snapshotOrigin, &windowRegion);
-    SetConsoleCursorPosition(hConsole, screenInfo.dwCursorPosition);
+
+    const BOOL screenRestored = WriteConsoleOutputW(
+        hConsole, screenSnapshot.data(), snapshotSize, snapshotOrigin, &popupRegion);
+    const BOOL attributesRestored =
+        SetConsoleTextAttribute(hConsole, screenInfo.wAttributes);
+    const BOOL cursorPositionRestored =
+        SetConsoleCursorPosition(hConsole, screenInfo.dwCursorPosition);
+    const BOOL cursorRestored = SetConsoleCursorInfo(hConsole, &originalCursorInfo);
+
+    if (!screenRestored || !attributesRestored ||
+        !cursorPositionRestored || !cursorRestored) {
+        std::cerr << "Lỗi popup: không thể khôi phục đầy đủ trạng thái console.\n";
+    }
 }
 
 void UI_Menu::printTableVe(const std::vector<Ve>& dsVe) {
@@ -870,7 +952,7 @@ void UI_Menu::printDSGheTrong_(int totalSeats, const std::vector<int>& seatStatu
             ? "GHẾ CÒN TRỐNG CỦA CHUYẾN BAY"
             : "GHẾ CÒN TRỐNG CỦA CHUYẾN BAY " + maCB);
 
-        std::cout << seatMapIndent << "      A     B     C           D     E     F\n";
+        std::cout << seatMapIndent << "      A     B     C         D     E     F\n";
         std::cout << seatMapIndent << "   ┌─────┬─────┬─────┐   ┌─────┬─────┬─────┐\n";
 
         for (int r = startRow; r < startRow + VISIBLE_ROWS && r < rows; ++r) {

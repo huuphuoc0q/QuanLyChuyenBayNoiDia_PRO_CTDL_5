@@ -124,9 +124,10 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, Tree<ChuyenBay>& dsChu
         //khoi tao thong tin khach hang + ve
         idx_++;
         KhachHang KH_ = KhachHang(idx_, Validation::chuanHoa(nameKH_), Validation::trimAndStandardizeSpace(cmndKH_));
-        Ve veKH_  = Ve(cbUserChon_->getMaCB() + std::to_string(numGhe+1), cbUserChon_->getMaCB(),cbUserChon_, numGhe, KH_);
+        Ve veKH_  = Ve(cbUserChon_->getMaCB() + (numGhe+1<10?"0":"") + std::to_string(numGhe+1), cbUserChon_->getMaCB(),cbUserChon_, numGhe, KH_);
 
         if (tmpDSVe_.push_back(veKH_)) {
+            cbUserChon_->xoaGheTrong(numGhe); 
             UI_Menu::showPopup("Đặt vé thành công. Vé đang chờ duyệt!", true);
         }
         else {
@@ -137,56 +138,76 @@ void datVe(int& idx_, MayBay* dsMayBay,int& sizeDSMayBay, Tree<ChuyenBay>& dsChu
 }
 
 void xuLyDatVe(LinkedList<Ve>& tmpDSVe_, std::vector<Ve>& dsVe_){
-    UI_Menu::clearScreen(); 
-    UI_Menu::printTitle("DANH SÁCH KHÁCH HÀNG ĐẶT VÉ"); 
-    std::string userInput; 
-
-    if(tmpDSVe_.empty()) { 
+    if (tmpDSVe_.empty()) {
         UI_Menu::showPopup("Hiện không có khách hàng đặt vé!", UI_Menu::POPUP_WARNING);
         return;
-    }    
+    }
 
-    
-    std::vector<Ve> dsVe_tmp;
-    tmpDSVe_.getList(dsVe_tmp);
-    UI_Menu::printTableVe(dsVe_tmp); 
-
-    
     while (true) {
-        if (!(UI_Menu::inputPrint_("Nhập Y để duyệt tất cả!", userInput))) return; 
-        if(Validation::toUpperCase(userInput) == "Y") {
-            int approvedCount = 0;
-            int rejectedCount = 0;
-            while(!tmpDSVe_.empty()){
-                listNode<Ve>* nodeVe_ = tmpDSVe_.popFront(); 
-                Ve nowVe_ = nodeVe_->data; delete nodeVe_; 
+        UI_Menu::clearScreen();
+        UI_Menu::printTitle("DANH SÁCH KHÁCH HÀNG ĐẶT VÉ");
+        std::vector<Ve> pendingTickets;
+        tmpDSVe_.getList(pendingTickets);
+        UI_Menu::printTableVe(pendingTickets);
 
-                ChuyenBay* cbVe_  = nowVe_.getCB(); 
-                if(cbVe_->getStatus() != 1) {
-                    rejectedCount++;
-                    continue; 
-                } 
-                if (cbVe_->kiemtraGheTrong(nowVe_.getSoGhe()) == false) {
-                    rejectedCount++;
-                    continue;
-                }
-                cbVe_->themVe(nowVe_);
-                dsVe_.push_back(nowVe_);
-                approvedCount++;
-                if (cbVe_->dayVe()) {
-                    cbVe_->setStatus(2);
-                }
+        std::string userInput;
+        if (!(UI_Menu::inputPrint_("Nhập mã vé cần duyệt hoặc Y để duyệt tất cả (ESC để thoát)", userInput))) return;
+        const std::string selection =
+            Validation::trimAndStandardizeSpace(Validation::toUpperCase(userInput));
+        int approvedCount = 0;
+        int rejectedCount = 0;
+
+        auto approveTicket = [&](const Ve& ticket) {
+            ChuyenBay* flight = ticket.getCB();
+            if (flight->getStatus() != 1) {
+                rejectedCount++;
+                return;
             }
-            FileStore::luuVe(dsVe_);
-            FileStore::luuThongTinKH(dsVe_);
-            std::string resultMessage = "Duyệt vé: " + std::to_string(approvedCount) +
-                    " thành công, " + std::to_string(rejectedCount) + " thất bại";
-            UI_Menu::showPopup(resultMessage, rejectedCount == 0);
-            return;
+
+            flight->themGheTrong(ticket.getSoGhe());
+            flight->themVe(ticket);
+            dsVe_.push_back(ticket);
+            approvedCount++;
+            if (flight->dayVe()) {
+                flight->setStatus(2);
+            }
+        };
+
+        if (selection == "Y") {
+            while(!tmpDSVe_.empty()){
+                listNode<Ve>* nodeVe_ = tmpDSVe_.popFront();
+                Ve ticket = nodeVe_->data;
+                delete nodeVe_;
+                approveTicket(ticket);
+            }
         }
         else {
-            UI_Menu::showPopup("Chỉ nhập Y để duyệt tất cả vé!", UI_Menu::POPUP_WARNING);
+            Ve selectedTicket;
+            bool found = false;
+            for (const Ve& ticket : pendingTickets) {
+                if (ticket.getMaVe() == selection) {
+                    selectedTicket = ticket;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                UI_Menu::showPopup("Không tìm thấy mã vé trong danh sách chờ duyệt.", UI_Menu::POPUP_WARNING);
+                continue;
+            }
+            if (!tmpDSVe_.removeVe(selectedTicket)) {
+                UI_Menu::showPopup("Không thể lấy vé khỏi danh sách chờ duyệt.", UI_Menu::POPUP_FAILURE);
+                continue;
+            }
+            approveTicket(selectedTicket);
         }
+
+        FileStore::luuVe(dsVe_);
+        FileStore::luuThongTinKH(dsVe_);
+        const std::string resultMessage = "Duyệt vé: " + std::to_string(approvedCount) +
+            " thành công, " + std::to_string(rejectedCount) + " thất bại";
+        UI_Menu::showPopup(resultMessage, rejectedCount == 0);
+        if (selection == "Y" || tmpDSVe_.empty()) return;
     }
 }
 
@@ -210,9 +231,40 @@ void xuLyTraVe(std::vector<Ve>& dsVe_){
         if (!xuatDSVe_(dsVe_, sizeDSVe_)) return; 
 
         q = -1;
-        if (!(UI_Menu::inputPrint_("Vui lòng nhập mã vé cần trả (Nhập ESC để thoát)", userInput))) return; 
+        if (!(UI_Menu::inputPrint_("Nhập mã vé cần trả hoặc Y để trả tất cả (ESC để thoát)", userInput))) return;
+        const std::string selection =
+            Validation::trimAndStandardizeSpace(Validation::toUpperCase(userInput));
+
+        if (selection == "Y") {
+            int returnedCount = 0;
+            int rejectedCount = 0;
+            for (int i = sizeDSVe_ - 1; i >= 0; --i) {
+                ChuyenBay* flight = dsVe_[i].getCB();
+                if (flight->getStatus() == 3) {
+                    rejectedCount++;
+                    continue;
+                }
+
+                const std::string ticketCode = dsVe_[i].getMaVe();
+                FileStore::xoaVe(ticketCode);
+                flight->xoaVe(ticketCode);
+                if (flight->getStatus() == 2) flight->setStatus(1);
+                dsVe_.erase(dsVe_.begin() + i);
+                sizeDSVe_--;
+                returnedCount++;
+            }
+
+            FileStore::luuVe(dsVe_);
+            FileStore::luuThongTinKH(dsVe_);
+            const std::string resultMessage = "Trả vé: " + std::to_string(returnedCount) +
+                " thành công, " + std::to_string(rejectedCount) +
+                " thất bại (chuyến bay đã hoàn tất)";
+            UI_Menu::showPopup(resultMessage, rejectedCount == 0);
+            return;
+        }
+
         for(int i = 0; i<sizeDSVe_; i++)    
-            if (dsVe_[i].getMaVe() == Validation::trimAndStandardizeSpace(Validation::toUpperCase(userInput)))
+            if (dsVe_[i].getMaVe() == selection)
                 q = i; 
         
         if(q == -1) {
@@ -326,7 +378,7 @@ int main(){
         std::system("cls");
         UI_Menu::printHeader(); 
         UI_Menu::printOption("MENU CHỨC NĂNG", optMenuChinh_);
-        cnt++; 
+        // cnt++; 
         if(!UI_Menu::inputPrint_("Bạn chọn (Nhập ESC để thoát chương trình)", q, false)) break;
 
         if( q == "1") hienThiDSChuyenBay(dsChuyenBay, sizeDSChuyenBay_); 

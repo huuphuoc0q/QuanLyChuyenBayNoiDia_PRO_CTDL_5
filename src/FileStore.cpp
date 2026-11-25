@@ -56,7 +56,7 @@ void FileStore::loadChuyenBay(Tree<ChuyenBay>& dsChuyenBay, int& sizeDSChuyenBay
             : soCho_;
         for (int i = 0; i < soKhachMau; ++i) {
             const int soGhe = i;
-            Ve veMau(maCB + std::to_string(soGhe + 1), maCB, &chuyenBayDaLuu,
+            Ve veMau(maCB +(soGhe+1<10?"0":"")+ std::to_string(soGhe + 1), maCB, &chuyenBayDaLuu,
                      soGhe, dsKhachHang[i]);
             chuyenBayDaLuu.themVe(veMau);
         }

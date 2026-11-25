@@ -96,13 +96,13 @@ Chạy chương trình:
 1. Chọn **Quản lý**.
 2. Đăng nhập bằng tài khoản trong `data/Admin.txt`.
 3. Chọn **Xử lý đặt vé**.
-4. Nhập `Y` để duyệt toàn bộ yêu cầu đang chờ.
+4. Nhập mã vé để duyệt riêng vé đó, hoặc nhập `Y` để duyệt toàn bộ yêu cầu đang chờ.
 
 ### 3. Trả vé
 
 1. Đăng nhập khu vực quản lý.
 2. Chọn **Xử lý trả vé**.
-3. Nhập mã vé cần trả.
+3. Nhập mã vé cần trả, hoặc nhập `Y` để trả toàn bộ vé chưa thuộc chuyến bay đã hoàn tất.
 
 Sau khi duyệt hoặc trả vé, dữ liệu được ghi lại vào `data/KhachHang.txt` và thư mục `data/DATA_VE/`.
 

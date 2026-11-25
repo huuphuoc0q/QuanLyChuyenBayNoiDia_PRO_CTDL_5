@@ -71,7 +71,7 @@ void ThongKe::displayDSGheTrong(Tree<ChuyenBay>& dsChuyenBay_, int sizeDSChuyenB
 
         resCB_ = res_->data_;
         if(resCB_.getStatus() != 1) {
-            UI_Menu::showPopup("Chuyến bay " + resCB_.getMaCB() + " đã bị huỷ hoặc đã hoàn tất!", UI_Menu::POPUP_WARNING);
+            UI_Menu::showPopup("Chuyến bay " + resCB_.getMaCB() + " đã bị huỷ, hết vé hoặc đã hoàn tất!", UI_Menu::POPUP_WARNING);
             continue;
         }
         const std::vector<int>& dsGheTrong_ = resCB_.getDSGheTrong();
