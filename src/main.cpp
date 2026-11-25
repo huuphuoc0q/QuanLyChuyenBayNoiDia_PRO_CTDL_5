@@ -258,7 +258,7 @@ void xuLyTraVe(std::vector<Ve>& dsVe_){
             FileStore::luuThongTinKH(dsVe_);
             const std::string resultMessage = "Trả vé: " + std::to_string(returnedCount) +
                 " thành công, " + std::to_string(rejectedCount) +
-                " thất bại (chuyến bay đã hoàn tất)";
+                " thất bại";
             UI_Menu::showPopup(resultMessage, rejectedCount == 0);
             return;
         }
